@@ -1,0 +1,61 @@
+header:
+  version: 14
+
+# =========================================================================
+# Target machine and distro
+# =========================================================================
+# stm32mp25-disco is the machine name for the STM32MP257F-DK board
+machine: stm32mp25-disco
+distro: poky
+target: custom-image
+
+# =========================================================================
+# Source repositories
+# =========================================================================
+repos:
+  poky:
+    url: https://git.yoctoproject.org/poky
+    branch: scarthgap
+
+  meta-openembedded:
+    url: https://github.com/openembedded/meta-openembedded
+    branch: scarthgap
+    layers:
+      meta-oe:
+      meta-python:
+      meta-networking:
+      meta-filesystems:
+
+  meta-st-stm32mp:
+    url: https://github.com/STMicroelectronics/meta-st-stm32mp
+    branch: scarthgap
+
+  # This repository — contains meta-custom-stm32mp257f layer
+  meta-custom:
+    path: .
+    layers:
+      meta-custom-stm32mp257f:
+
+# =========================================================================
+# Build configuration
+# =========================================================================
+local_conf_header:
+  standard: |
+    # Accept STMicroelectronics EULA for the STM32MP25-DK board firmware
+    ACCEPT_EULA_stm32mp25-disco = "1"
+
+    # Use systemd as the init system
+    DISTRO_FEATURES:append = " systemd"
+    VIRTUAL-RUNTIME_init_manager = "systemd"
+    DISTRO_FEATURES_BACKFILL_CONSIDERED += "sysvinit"
+    VIRTUAL-RUNTIME_initscripts = "systemd-compat-units"
+
+    # Parallel build configuration (auto-detect host CPU count)
+    BB_NUMBER_THREADS ?= "${@oe.utils.cpu_count()}"
+    PARALLEL_MAKE ?= "-j ${@oe.utils.cpu_count()}"
+
+    # Disk space management — remove work directory after a task is done
+    INHERIT += "rm_work"
+
+    # Enable additional image types
+    IMAGE_FSTYPES += "tar.gz"

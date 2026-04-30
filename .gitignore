@@ -1,0 +1,11 @@
+# Yocto build directory
+build/
+sstate-cache/
+downloads/
+
+# BitBake generated files
+*.pyc
+__pycache__/
+
+# Kas checkout directories (layers fetched by kas)
+layers/

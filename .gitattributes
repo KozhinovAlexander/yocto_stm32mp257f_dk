@@ -1,0 +1,26 @@
+# Enforce LF line endings for all text files
+* text=auto eol=lf
+
+# Shell scripts — mark executable
+scripts/*.sh text eol=lf
+
+# Yocto / BitBake files
+*.bb    text eol=lf
+*.bbappend text eol=lf
+*.inc   text eol=lf
+*.conf  text eol=lf
+
+# YAML
+*.yml   text eol=lf
+*.yaml  text eol=lf
+
+# Markdown
+*.md    text eol=lf
+
+# Ensure binary files are not mangled
+*.png   binary
+*.jpg   binary
+*.xz    binary
+*.gz    binary
+*.stm32 binary
+*.bin   binary

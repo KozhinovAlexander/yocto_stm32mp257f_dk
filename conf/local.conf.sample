@@ -1,0 +1,27 @@
+MACHINE ??= "stm32mp257f-dk"
+DISTRO  ?=  "openstlinux-weston"
+
+# Accept ST EULA for STM32MP2 machines (required by meta-st-stm32mp)
+ACCEPT_EULA_stm32mp257f-dk = "1"
+
+# Build output directories — override via environment variables for CI
+DL_DIR    ?= "${TOPDIR}/../downloads"
+SSTATE_DIR ?= "${TOPDIR}/../sstate-cache"
+TMPDIR     = "${TOPDIR}/tmp"
+
+BB_NUMBER_THREADS ?= "${@oe.utils.cpu_count()}"
+PARALLEL_MAKE     ?= "-j${@oe.utils.cpu_count()}"
+
+PACKAGE_CLASSES ?= "package_ipk"
+EXTRA_IMAGE_FEATURES ?= "debug-tweaks"
+USER_CLASSES ?= "buildstats"
+
+# Disk space monitor — stop tasks below 1 GB free, abort below 100 MB
+BB_DISKMON_DIRS ??= "\
+  STOPTASKS,${TMPDIR},1G,100K \
+  STOPTASKS,${DL_DIR},1G,100K \
+  STOPTASKS,${SSTATE_DIR},1G,100K \
+  ABORT,${TMPDIR},100M,1K \
+  ABORT,${DL_DIR},100M,1K \
+  ABORT,${SSTATE_DIR},100M,1K \
+"

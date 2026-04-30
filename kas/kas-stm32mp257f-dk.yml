@@ -1,0 +1,49 @@
+header:
+  version: 14
+
+machine: stm32mp257f-dk
+distro: openstlinux-weston
+target:
+  - stm32mp257f-image-minimal
+
+repos:
+  poky:
+    url: https://github.com/yoctoproject/poky.git
+    branch: scarthgap
+    layers:
+      meta:
+      meta-poky:
+      meta-yocto-bsp:
+
+  meta-openembedded:
+    url: https://github.com/openembedded/meta-openembedded.git
+    branch: scarthgap
+    layers:
+      meta-oe:
+      meta-python:
+      meta-networking:
+      meta-multimedia:
+      meta-filesystems:
+
+  meta-st-stm32mp:
+    url: https://github.com/STMicroelectronics/meta-st-stm32mp.git
+    branch: scarthgap
+
+  meta-st-openstlinux:
+    url: https://github.com/STMicroelectronics/meta-st-openstlinux.git
+    branch: scarthgap
+
+  meta-stm32mp257f-custom:
+    url: https://github.com/KozhinovAlexander/yocto_stm32mp257f_dk.git
+    branch: main
+    layers:
+      meta-stm32mp257f-custom:
+
+local_conf_header:
+  standard: |
+    ACCEPT_EULA_stm32mp257f-dk = "1"
+    DL_DIR    ?= "${TOPDIR}/../downloads"
+    SSTATE_DIR ?= "${TOPDIR}/../sstate-cache"
+    BB_NUMBER_THREADS ?= "${@oe.utils.cpu_count()}"
+    PARALLEL_MAKE ?= "-j${@oe.utils.cpu_count()}"
+    EXTRA_IMAGE_FEATURES ?= "debug-tweaks"

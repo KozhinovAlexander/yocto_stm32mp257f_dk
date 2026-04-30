@@ -1,0 +1,93 @@
+name: CI – Full Yocto Build
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      image_target:
+        description: "BitBake image target"
+        required: false
+        default: "stm32mp257f-image-minimal"
+      clean_build:
+        description: "Force clean build (ignore sstate cache)"
+        type: boolean
+        required: false
+        default: false
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: Build ${{ github.event.inputs.image_target || 'stm32mp257f-image-minimal' }}
+    runs-on: [self-hosted, yocto-builder]
+    timeout-minutes: 360
+
+    env:
+      IMAGE_TARGET: ${{ github.event.inputs.image_target || 'stm32mp257f-image-minimal' }}
+      SSTATE_DIR:   /srv/yocto/sstate-cache
+      DL_DIR:       /srv/yocto/downloads
+      BUILD_DIR:    ${{ github.workspace }}/build
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up layers
+        run: bash scripts/setup-layers.sh
+
+      - name: Optionally clear sstate cache
+        if: ${{ github.event.inputs.clean_build == 'true' }}
+        run: |
+          echo "Clean build requested — wiping sstate cache"
+          rm -rf "${SSTATE_DIR}"
+
+      - name: Configure build
+        run: |
+          source layers/poky/oe-init-build-env "${BUILD_DIR}"
+          cp ../conf/bblayers.conf.sample conf/bblayers.conf
+          cp ../conf/local.conf.sample    conf/local.conf
+          sed -i "s|##OEROOT##|$(realpath ..)|g" conf/bblayers.conf
+          # Inject CI-specific persistent cache paths
+          echo "DL_DIR     = \"${DL_DIR}\""     >> conf/local.conf
+          echo "SSTATE_DIR = \"${SSTATE_DIR}\"" >> conf/local.conf
+        shell: bash
+
+      - name: Show layer stack
+        run: |
+          source layers/poky/oe-init-build-env "${BUILD_DIR}"
+          bitbake-layers show-layers
+        shell: bash
+
+      - name: BitBake – build image
+        run: |
+          source layers/poky/oe-init-build-env "${BUILD_DIR}"
+          bitbake "${IMAGE_TARGET}"
+        shell: bash
+
+      - name: Collect artifacts
+        run: |
+          DEPLOY="${BUILD_DIR}/tmp/deploy/images/stm32mp257f-dk"
+          mkdir -p artifacts
+          cp "${DEPLOY}"/*.wic.xz              artifacts/ 2>/dev/null || true
+          cp "${DEPLOY}"/tf-a-*.stm32          artifacts/ 2>/dev/null || true
+          cp "${DEPLOY}"/fip-*.bin             artifacts/ 2>/dev/null || true
+          cp "${DEPLOY}"/Image                 artifacts/ 2>/dev/null || true
+          cp "${DEPLOY}"/*.dtb                 artifacts/ 2>/dev/null || true
+          cp -r "${DEPLOY}"/flashlayout_*/     artifacts/ 2>/dev/null || true
+          echo "=== Artifact list ==="
+          ls -lh artifacts/
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: stm32mp257f-dk-image-${{ github.sha }}
+          path: artifacts/
+          retention-days: 30
+
+      - name: Report sstate disk usage
+        if: always()
+        run: |
+          du -sh "${SSTATE_DIR}" 2>/dev/null || echo "sstate dir not found"
+        shell: bash

@@ -1,0 +1,73 @@
+name: Layer Sanity Check
+
+on:
+  push:
+    branches: ["**"]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  layer-check:
+    name: Lint & validate meta-stm32mp257f-custom
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install Yocto host dependencies
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends \
+            gawk wget git diffstat unzip texinfo gcc build-essential \
+            chrpath socat cpio python3 python3-pip python3-pexpect \
+            xz-utils debianutils iputils-ping python3-git python3-jinja2 \
+            libegl1-mesa libsdl1.2-dev xterm zstd liblz4-tool file \
+            locales libacl1 lz4 python3-subunit
+          sudo locale-gen en_US.UTF-8
+
+      - name: Install kas
+        run: pip3 install kas
+
+      - name: Clone layers (setup-layers.sh)
+        run: bash scripts/setup-layers.sh
+
+      - name: Initialize build environment and copy configs
+        run: |
+          source layers/poky/oe-init-build-env build
+          cp ../conf/bblayers.conf.sample conf/bblayers.conf
+          cp ../conf/local.conf.sample    conf/local.conf
+          sed -i "s|##OEROOT##|$(realpath ..)|g" conf/bblayers.conf
+        shell: bash
+
+      - name: Show layer stack
+        run: |
+          source layers/poky/oe-init-build-env build
+          bitbake-layers show-layers
+        shell: bash
+
+      - name: Show recipe providers for image target
+        run: |
+          source layers/poky/oe-init-build-env build
+          bitbake-layers show-recipes "stm32mp257f-image-minimal"
+        shell: bash
+
+      - name: Validate layer.conf syntax
+        run: |
+          python3 - <<'EOF'
+          import sys
+          content = open('meta-stm32mp257f-custom/conf/layer.conf').read()
+          required = ['LAYERSERIES_COMPAT', 'BBFILE_PRIORITY', 'LAYERDEPENDS']
+          failed = False
+          for key in required:
+              if key not in content:
+                  print(f'FAIL: {key} missing from layer.conf')
+                  failed = True
+          if failed:
+              sys.exit(1)
+          print('layer.conf OK')
+          EOF

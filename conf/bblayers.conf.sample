@@ -1,0 +1,17 @@
+LCONF_VERSION = "7"
+BBPATH = "${TOPDIR}"
+BBFILES ?= ""
+
+BBLAYERS ?= " \
+  ##OEROOT##/layers/poky/meta                              \
+  ##OEROOT##/layers/poky/meta-poky                         \
+  ##OEROOT##/layers/poky/meta-yocto-bsp                    \
+  ##OEROOT##/layers/meta-openembedded/meta-oe              \
+  ##OEROOT##/layers/meta-openembedded/meta-python          \
+  ##OEROOT##/layers/meta-openembedded/meta-networking      \
+  ##OEROOT##/layers/meta-openembedded/meta-multimedia      \
+  ##OEROOT##/layers/meta-openembedded/meta-filesystems     \
+  ##OEROOT##/layers/meta-st-stm32mp                        \
+  ##OEROOT##/layers/meta-st-openstlinux                    \
+  ##OEROOT##/layers/meta-stm32mp257f-custom                \
+"

@@ -77,7 +77,8 @@ local_conf:
 	sed -i '/^MACHINE/d' $$conf && echo 'MACHINE="$(MACHINE)"' >> $$conf; \
 	sed -i '/^INHERIT += "rm_work"/d' $$conf && echo 'INHERIT += "rm_work"' >> $$conf; \
 	sed -i '/^ASSUME_PROVIDED:remove="virtual\/crypt-native"/d' $$conf && echo 'ASSUME_PROVIDED:remove="virtual/crypt-native"' >> $$conf; \
-	sed -i '/^ACCEPT_EULA_$(MACHINE)="1"/d' $$conf && echo 'ACCEPT_EULA_$(MACHINE)="1"' >> $$conf;
+	sed -i '/^ACCEPT_EULA_$(MACHINE)="1"/d' $$conf && echo 'ACCEPT_EULA_$(MACHINE)="1"' >> $$conf; \
+	sed -i '/^IMAGE_INSTALL:append="Dropbear"/d' $$conf && echo 'IMAGE_INSTALL:append="Dropbear"' >> $$conf;
 
 bblayers_configure:
 	@source $(CURRENT_DIR)/poky/oe-init-build-env; \

@@ -11,24 +11,26 @@ STM32_Programmer_CLI := $(STM32_Programmer_CLI_DIR)/bin/STM32_Programmer_CLI
 #	openstlinux-rt - real time linux based on  X-LINUX-RT (PREEMPT_RT patchset)
 DISTRO ?= openstlinux-rt
 
-MACHINE := stm32mp2
-BUILD_TARGET ?= st-image-core
+SOC ?= stm32mp2
+MACHINE := $(SOC)
+BOARD_VARIANT := $(SOC)57f-dk
+
+BUILD_TARGET := st-image-core
+BOOT_CHAIN := optee
 
 ifeq ($(DISTRO),openstlinux-rt)
 # openstlinux-rt - case, only st-image-core supported
-BUILD_TARGET = st-image-core
-MACHINE := $(MACHINE)-rt-perf
+BUILD_TARGET := st-image-core
+MACHINE := $(SOC)-rt-perf
+BOARD_VARIANT:= $(BOARD_VARIANT)-perf-rt
+BOOT_CHAIN := $(BOOT_CHAIN)min
 endif
 
-BOARD_VARIANT := $(MACHINE)57f-dk
+FLASH_LAYOUT := FlashLayout_sdcard_$(BOARD_VARIANT)-$(BOOT_CHAIN)
 
 POKY_VERSION ?= scarthgap
 OUT_IMGS_DIR := $(BUILD_DIR)/tmp-glibc/deploy/images/$(MACHINE)
 OUT_IMGS_SCRIPT_DIR := $(OUT_IMGS_DIR)/scripts
-
-# Choose one of: extensible, fastboot, optee
-# see more in: $(OUT_IMGS_DIR)/flashlayout_$(BUILD_TARGET)
-BOOT_CHAIN ?= optee
 
 
 all: fix_app_armor build create_sdcard_from_flashlayout
@@ -99,12 +101,12 @@ build: env local_conf bblayers_configure
 
 create_sdcard_from_flashlayout:
 	@source $(CURRENT_DIR)/poky/oe-init-build-env && $(OUT_IMGS_SCRIPT_DIR)/create_sdcard_from_flashlayout.sh \
-	$(OUT_IMGS_DIR)/flashlayout_$(BUILD_TARGET)/$(BOOT_CHAIN)/FlashLayout_sdcard_$(BOARD_VARIANT)-$(BOOT_CHAIN).tsv
+	$(OUT_IMGS_DIR)/flashlayout_$(BUILD_TARGET)/$(BOOT_CHAIN)/$(FLASH_LAYOUT).tsv
 
 # usage: make flash MICROSD_CARD=/dev/sdX
 flash:
 	@umount $(MICROSD_CARD) || true
-	@sudo dd if=$(OUT_IMGS_DIR)/flashlayout_$(BUILD_TARGET)/$(BOOT_CHAIN)/FlashLayout_sdcard_$(BOARD_VARIANT)-$(BOOT_CHAIN).raw \
+	@sudo dd if=$(OUT_IMGS_DIR)/flashlayout_$(BUILD_TARGET)/$(BOOT_CHAIN)/$(FLASH_LAYOUT).raw \
 	of=$(MICROSD_CARD) bs=8M conv=fdatasync status=progress
 
 configure_stm32_programmer:
@@ -114,7 +116,7 @@ configure_stm32_programmer:
 
 flash_stm32_programmer: configure_stm32_programmer
 	@set -e; \
-	tsvfname=FlashLayout_sdcard_$(BOARD_VARIANT)-$(BOOT_CHAIN).tsv; \
+	tsvfname=$(FLASH_LAYOUT).tsv; \
 	tsvf_dir=$(OUT_IMGS_DIR)/flashlayout_$(BUILD_TARGET)/$(BOOT_CHAIN); \
 	tsvf=$$tsvf_dir/$$tsvfname; \
 	tsvf_copy=$$tsvf_dir/../../.$$tsvfname; \

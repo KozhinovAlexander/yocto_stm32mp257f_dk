@@ -2,6 +2,8 @@
 
 This is a custom Yocto image for [stm32mp257f-dk](https://www.st.com/en/evaluation-tools/stm32mp257f-dk.html) intended to provide vanila Yocto build flow.
 
+This work was inspierd by [bootlin's Yocto Project and OpenEmbedded development training][_bootlin_yocto_training_].
+
 - [Yocto Image for SMT32MP257f-DK Dicovery Kit](#yocto-image-for-smt32mp257f-dk-dicovery-kit)
   - [Getting Started](#getting-started)
   - [Flashing Target via STM32 Cube Programmer CLI](#flashing-target-via-stm32-cube-programmer-cli)
@@ -34,8 +36,6 @@ Build with make:
 ```bash
 make
 ```
-
-For more information refer to [./docs/yocto-stm32mp1-labs.pdf](./docs/yocto-stm32mp1-labs.pdf) to proceed.
 
 **NOTE:** You may refer to [Makefile][_makefile_] to find out, what else build types are possible.
 
@@ -108,6 +108,7 @@ picocom -b 115200 /dev/ttyACM0
 You may use `minicom` with same command line arguments.
 
 
+[_bootlin_yocto_training_]: https://bootlin.com/training/yocto/
 [_makefile_]: ./Makefile
 [_starter_package_]: https://wiki.st.com/stm32mpu/wiki/STM32MP25_Discovery_kits_-_Starter_Package
 [_6_3_image_flashing_raw_]: https://wiki.st.com/stm32mpu/wiki/STM32MP25_Discovery_kits_-_Starter_Package#Image_flashing_via_raw_image

@@ -10,7 +10,7 @@ STM32_Programmer_CLI := $(STM32_Programmer_CLI_DIR)/bin/STM32_Programmer_CLI
 #	openstlinux-weston - default ST's provided linux distribution
 #	openstlinux-rt - real time linux based on  X-LINUX-RT (PREEMPT_RT patchset)
 DISTRO ?= openstlinux-rt
-
+POKY_VERSION ?= scarthgap
 SOC ?= stm32mp2
 MACHINE := $(SOC)
 BOARD_VARIANT := $(SOC)57f-dk
@@ -26,11 +26,11 @@ BOARD_VARIANT:= $(BOARD_VARIANT)-perf-rt
 BOOT_CHAIN := $(BOOT_CHAIN)min
 endif
 
-FLASH_LAYOUT := FlashLayout_sdcard_$(BOARD_VARIANT)-$(BOOT_CHAIN)
-
-POKY_VERSION ?= scarthgap
 OUT_IMGS_DIR := $(BUILD_DIR)/tmp-glibc/deploy/images/$(MACHINE)
 OUT_IMGS_SCRIPT_DIR := $(OUT_IMGS_DIR)/scripts
+TSV_DIR := $(OUT_IMGS_DIR)/flashlayout_$(BUILD_TARGET)/$(BOOT_CHAIN)
+FLASH_LAYOUT := FlashLayout_sdcard_$(BOARD_VARIANT)-$(BOOT_CHAIN)
+FLASH_LAYOUT_RAW_DIR := $(TSV_DIR)/../..
 
 
 all: fix_app_armor build create_sdcard_from_flashlayout
@@ -100,13 +100,14 @@ build: env local_conf bblayers_configure
 	@source $(CURRENT_DIR)/poky/oe-init-build-env && bitbake $(BUILD_TARGET)
 
 create_sdcard_from_flashlayout:
-	@source $(CURRENT_DIR)/poky/oe-init-build-env && $(OUT_IMGS_SCRIPT_DIR)/create_sdcard_from_flashlayout.sh \
-	$(OUT_IMGS_DIR)/flashlayout_$(BUILD_TARGET)/$(BOOT_CHAIN)/$(FLASH_LAYOUT).tsv
+	@rm -f $(FLASH_LAYOUT_RAW_DIR)/$(FLASH_LAYOUT).raw
+	@source $(CURRENT_DIR)/poky/oe-init-build-env && \
+	$(OUT_IMGS_SCRIPT_DIR)/create_sdcard_from_flashlayout.sh $(TSV_DIR)/$(FLASH_LAYOUT).tsv
 
 # usage: make flash MICROSD_CARD=/dev/sdX
 flash:
 	@umount $(MICROSD_CARD) || true
-	@sudo dd if=$(OUT_IMGS_DIR)/flashlayout_$(BUILD_TARGET)/$(BOOT_CHAIN)/$(FLASH_LAYOUT).raw \
+	@sudo dd if=$(FLASH_LAYOUT_RAW_DIR)/$(FLASH_LAYOUT).raw \
 	of=$(MICROSD_CARD) bs=8M conv=fdatasync status=progress
 
 configure_stm32_programmer:
@@ -117,7 +118,7 @@ configure_stm32_programmer:
 flash_stm32_programmer: configure_stm32_programmer
 	@set -e; \
 	tsvfname=$(FLASH_LAYOUT).tsv; \
-	tsvf_dir=$(OUT_IMGS_DIR)/flashlayout_$(BUILD_TARGET)/$(BOOT_CHAIN); \
+	tsvf_dir=$(TSV_DIR); \
 	tsvf=$$tsvf_dir/$$tsvfname; \
 	tsvf_copy=$$tsvf_dir/../../.$$tsvfname; \
 	rm -f $$tsvf_copy; \

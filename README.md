@@ -1,6 +1,6 @@
 # Yocto Image for SMT32MP257f-DK Dicovery Kit
 
-A custom sample Yocto image for [stm32mp257f-dk](https://www.st.com/en/evaluation-tools/stm32mp257f-dk.html)
+This is a custom Yocto image for [stm32mp257f-dk](https://www.st.com/en/evaluation-tools/stm32mp257f-dk.html) intended to provide vanila Yocto build flow.
 
 - [Yocto Image for SMT32MP257f-DK Dicovery Kit](#yocto-image-for-smt32mp257f-dk-dicovery-kit)
   - [Getting Started](#getting-started)
@@ -17,22 +17,16 @@ Clone the repository:
 git clone <repo-url>
 ```
 
-Add git submodules:
-
-```bash
-make git_submodules_add
-```
-
-Update git submodules:
-
-```bash
-make git_submodules_update
-```
-
 Install dependencies:
 
 ```bash
 make install_dependencies
+```
+
+Configure git submodules:
+
+```bash
+make git_submodules_configure
 ```
 
 Build with make:
@@ -86,6 +80,8 @@ This section rely on [7 Booting][_7_booting_].
 - Check USB-C power supply (**!!!no data!!!**) is connected to port (4).
 - Press reset button (2).
 - Continue with [Connecting to the Target](#connecting-to-the-target) section.
+
+**NOTE:** The first boot after flash will try to configure the board, which may take up to 5 minutes!
 
 ## Connecting to the Target
 

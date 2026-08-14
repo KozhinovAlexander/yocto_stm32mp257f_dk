@@ -5,11 +5,11 @@ This is a custom Yocto image for [stm32mp257f-dk](https://www.st.com/en/evaluati
 This work was inspierd by [bootlin's Yocto Project and OpenEmbedded development training][_bootlin_yocto_training_].
 
 - [Yocto Image for SMT32MP257f-DK Dicovery Kit](#yocto-image-for-smt32mp257f-dk-dicovery-kit)
-  - [Getting Started](#getting-started)
-  - [Flashing Target via STM32 Cube Programmer CLI](#flashing-target-via-stm32-cube-programmer-cli)
-  - [Flashing Target via dd tool](#flashing-target-via-dd-tool)
-  - [Booting the Board](#booting-the-board)
-  - [Connecting to the Target](#connecting-to-the-target)
+	- [Getting Started](#getting-started)
+	- [Flashing Target via STM32 Cube Programmer CLI](#flashing-target-via-stm32-cube-programmer-cli)
+	- [Flashing Target via dd tool](#flashing-target-via-dd-tool)
+	- [Booting the Board](#booting-the-board)
+	- [Connecting to the Target](#connecting-to-the-target)
 
 ## Getting Started
 
@@ -30,6 +30,8 @@ Configure git submodules:
 ```bash
 make git_submodules_configure
 ```
+
+It is recommended to use docker container. Check out the [readme](./docker/README.md)
 
 Build with make:
 

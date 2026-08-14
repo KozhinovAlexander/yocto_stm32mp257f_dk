@@ -142,5 +142,5 @@ clean:
 	@source $(CURRENT_DIR)/poky/oe-init-build-env && \
 	devtool reset $(BUILD_TARGET) && \
 	bitbake $(BUILD_TARGET) -c cleansstate; \
-	rm -f $(BUILD_DIR)/conf/local.conf; \
-	rm -f $(BUILD_DIR)/cache;
+	rm -rf $(BUILD_DIR)/conf/local.conf; \
+	rm -rf $(BUILD_DIR)/cache;

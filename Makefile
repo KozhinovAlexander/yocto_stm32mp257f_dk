@@ -29,7 +29,7 @@ TSV_DIR := $(OUT_IMGS_DIR)/flashlayout_$(BUILD_TARGET)/$(BOOT_CHAIN)
 FLASH_LAYOUT := FlashLayout_sdcard_$(BOARD_VARIANT)-$(BOOT_CHAIN)
 FLASH_LAYOUT_RAW_DIR := $(TSV_DIR)/../..
 
-all: fix_app_armor build create_sdcard_from_flashlayout
+all: build create_sdcard_from_flashlayout
 
 install_dependencies:
 	@sudo apt update

@@ -1,0 +1,20 @@
+services:
+  build-yocto-stm32mp257f-dk:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        USER_NAME: ${USER:-yocto}
+        USER_UID: ${UID:-1000}
+        USER_GID: ${GID:-1000}
+    image: yocto-stm32mp257f-dk
+    stdin_open: true
+    tty: true
+    volumes:
+      - ..:/workspace
+    entrypoint: |
+      /bin/bash -c "
+        git config --global user.email 'you@example.com'
+        git config --global user.name 'Your Name'
+        trap : TERM INT; sleep infinity & wait
+       "

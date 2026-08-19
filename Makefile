@@ -58,7 +58,10 @@ git_submodules_configure:
 		git submodule add --force --name $$key $$value $$key; \
 		cd $$key && git checkout $(POKY_VERSION); \
 		popd; \
-	done; \
+	done;
+	$(MAKE) git_submodules_update
+
+git_submodules_update:
 	git submodule update --init --recursive
 
 env:

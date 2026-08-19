@@ -37,7 +37,7 @@ install_dependencies:
 		socat cpio python3 python3-pip python3-pexpect xz-utils debianutils \
 		iputils-ping python3-git python3-jinja2 python3-subunit zstd lz4 \
 		file locales libacl1 chrpath diffstat g++ gawk cmake make libusb-1.0-0 \
-		picocom minicom nfs-kernel-server bmap-tools tftpd-hpa;
+		picocom minicom nfs-kernel-server bmap-tools tftpd-hpa gdisk;
 
 fix_app_armor:
 	@echo 0 | sudo tee /proc/sys/kernel/apparmor_restrict_unprivileged_userns

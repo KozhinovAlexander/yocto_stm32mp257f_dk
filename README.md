@@ -25,10 +25,10 @@ Install dependencies:
 make install_dependencies
 ```
 
-Configure git submodules:
+Update git submodules:
 
 ```bash
-make git_submodules_configure
+make git_submodules_update
 ```
 
 It is recommended to use docker container. Check out the [readme](./docker/README.md)

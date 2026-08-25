@@ -120,7 +120,8 @@ flash_stm32_programmer: configure_stm32_programmer
 	rm -f $$tsvf_copy; \
 	cp $$tsvf $$tsvf_copy ; \
 	dev_idx=$$($(STM32_Programmer_CLI) -l usb | grep -o 'USB[0-9]\+'); \
-	$(STM32_Programmer_CLI) -c port=$$dev_idx -w $$tsvf_copy -tm 12000; \
+	$(STM32_Programmer_CLI) -c port=$$dev_idx -d $$tsvf_copy; \
+	$(STM32_Programmer_CLI) -c port=$$dev_idx --detach; \
 	rm -f $$tsvf_copy;
 
 build_u_boot:
